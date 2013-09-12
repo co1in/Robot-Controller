@@ -1,0 +1,32 @@
+#################
+## Eclipse
+#################
+
+*.pydevproject
+.project
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+*.properties
+
+#Android Crap
+*.jar
+
+#IntelliJ Crap
+out/
+.idea/
+RobotController/build/
+RobotController/src/main/gen/
+RobotController/src/main/main.iml
+.gradle/
+
+# Mac crap
+.DS_Store
