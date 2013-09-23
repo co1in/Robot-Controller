@@ -30,6 +30,7 @@ public class MainActivity extends Activity implements SensorEventListener
     private RelativeLayout rootLayout;
 
     private TextView[] secondValues;
+    private Network network;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,6 +39,8 @@ public class MainActivity extends Activity implements SensorEventListener
         setContentView(R.layout.activity_main);
         
 		accelerometerValues = new ArrayList<PointF>();
+        network = new Network();
+        network.connect("192.168.43.24", 5565);
 
         rootLayout = (RelativeLayout)findViewById(R.id.root);
         rootLayout.setOnClickListener(new View.OnClickListener()
@@ -102,28 +105,7 @@ public class MainActivity extends Activity implements SensorEventListener
     @Override
     public void onSensorChanged(SensorEvent sensorEvent)
     {
-        if(sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE)
-        {
-            /*values = sensorEvent.values;
-            values = getSmoothValues(sensorEvent.values, values);
-            for(int i = 0; i < 3; i++)
-            {
-                values[i] *= 10f;
-                values[i] = Math.round(values[i]);
-                values[i] /= 10f;
-            }
-            xText.setText("x: " + values[0]);
-            yText.setText("y: " + values[1]);
-            zText.setText("z: " + values[2]);
-
-            /*
-            float[] cuttOffvalues = cutOffBadValues(values.clone());
-
-            secondValues[0].setText("x: " + cuttOffvalues[0]);
-            secondValues[1].setText("y: " + cuttOffvalues[1]);
-            secondValues[2].setText("z: " + cuttOffvalues[2]);*/
-        }
-        else if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+        if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
         {
             System.arraycopy(sensorEvent.values, 0, mLastAccelerometer, 0, sensorEvent.values.length);
             mLastAccelerometerSet = true;
@@ -150,14 +132,16 @@ public class MainActivity extends Activity implements SensorEventListener
             zText.setText("z: " + mOrientation[2]);
 
             float[] sendValues = processValues(mOrientation.clone());
+            network.sendValues(sendValues);
 
             secondValues[0].setText("x: " + sendValues[0]);
             secondValues[1].setText("y: " + sendValues[1] * -1);
             secondValues[2].setText("z: " + sendValues[2]);
+
         }
     }
 
-    private float[] processValues(float[] input)
+    private float[] processValues(float[] values)
     {
         //Process the z axis values
         values[2] += 1.0f;
@@ -188,7 +172,7 @@ public class MainActivity extends Activity implements SensorEventListener
         }
         else
         {
-            if(values[1] > -1f && values[1] < 1f)
+            if(values[1] > -.1f && values[1] < .1f)
                 values[1] = 0f;
             else
             {
@@ -199,37 +183,14 @@ public class MainActivity extends Activity implements SensorEventListener
             }
         }
 
+        for(int i = 0; i < 3; i++)
+        {
+            values[i] *= 100f;
+            values[i] = Math.round(values[i]);
+            values[i] /= 100f;
+        }
+
         return values;
-    }
-
-    private float[] cutOffBadValues(float[] input)
-    {
-        /*if(input[0] < -6 && input[2] >= 0)
-            input[2] = 0f;
-        else if(input[0] < 0 && input[2] > 0)
-            input[2] = 10.0f;
-
-        if(input[0] < -6 && input[2] < 0)
-            input[0] = 0.0f;
-        else if(input[0] < 0 && input[2] < 0)
-            input[0] = -10;
-
-        if(input[0] < 0 && input[1] < 0)
-            input[1] = -10;
-        else if(input[0] < 0 && input[1] >= 0)
-            input[1] = 10f;
-        else if(input[0] < -4)
-            input[1] = 0f;*/
-
-        input[0] -= 9.7;
-        input[0] = Math.abs(input[0]);
-        input[0] *= 10;
-        input[0] = Math.round(input[0]);
-        input[0] /= 10f;
-        if(input[1] < 0)
-            input[0] *= -1;
-
-        return input;
     }
 
     static final float ALPHA = 0.1f;
@@ -258,7 +219,6 @@ public class MainActivity extends Activity implements SensorEventListener
     protected void onResume()
     {
         super.onResume();
-
 
         accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
