@@ -40,7 +40,7 @@ public class MainActivity extends Activity implements SensorEventListener
         
 		accelerometerValues = new ArrayList<PointF>();
         network = new Network();
-        network.connect("192.168.43.24", 5565);
+        network.connect("10.17.68.2", 5565);
 
         rootLayout = (RelativeLayout)findViewById(R.id.root);
         rootLayout.setOnClickListener(new View.OnClickListener()
