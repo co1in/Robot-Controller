@@ -22,7 +22,7 @@ public class MainActivity extends Activity implements SensorEventListener
     private TextView xText, yText, zText;
     private int nums = 0;
     private SensorManager sensorManager;
-	private ArrayList<PointF> accelerometerValues;
+    private ArrayList<PointF> accelerometerValues;
 
     private boolean isCalibrating = false;
     private SharedPreferences prefs;
@@ -37,10 +37,10 @@ public class MainActivity extends Activity implements SensorEventListener
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-		accelerometerValues = new ArrayList<PointF>();
+
+        accelerometerValues = new ArrayList<PointF>();
         network = new Network();
-        network.connect("10.17.68.2", 5565);
+        network.connect("10.17.68.2");
 
         rootLayout = (RelativeLayout)findViewById(R.id.root);
         rootLayout.setOnClickListener(new View.OnClickListener()
@@ -70,7 +70,7 @@ public class MainActivity extends Activity implements SensorEventListener
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
     }
-	
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -194,9 +194,9 @@ public class MainActivity extends Activity implements SensorEventListener
     }
 
     static final float ALPHA = 0.1f;
-	protected float[] getSmoothValues(float[] newValues, float[] oldValues)
-	{
-		if(oldValues == null) return newValues;
+    protected float[] getSmoothValues(float[] newValues, float[] oldValues)
+    {
+        if(oldValues == null) return newValues;
 
         for(int i = 0; i < newValues.length; i++)
         {
@@ -206,8 +206,8 @@ public class MainActivity extends Activity implements SensorEventListener
                 oldValues[i] += ALPHA * (newValues[i] - oldValues[i]);
         }
         return oldValues;
-	}
-	
+    }
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int i)
     {

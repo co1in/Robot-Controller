@@ -8,11 +8,13 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+
 public class Network
 {
+    private NetworkTable networkTable;
+
     String address;
-    int port;
-    Socket socket;
     PrintWriter writer;
     BufferedReader reader;
 
@@ -21,27 +23,13 @@ public class Network
 
     }
 
-    public void connect(String address, int port)
+    public void connect(String address)
     {
         this.address = address;
-        this.port = port;
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    socket = new Socket(Network.this.address, Network.this.port);
-                    writer = new PrintWriter(socket.getOutputStream(), true);
-                    reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                }
-                catch (IOException e)
-                {
-                    Log.e("Connection Error", e.toString());
-                }
-            }
-        }).start();
+
+        NetworkTable.setClientMode();
+        NetworkTable.setIPAddress(address);
+        networkTable = NetworkTable.getTable("accelerometer-values");
     }
 
     private float[] values;
@@ -53,13 +41,9 @@ public class Network
             @Override
             public void run()
             {
-                String sendString = new String();
-
-                for(int i = 0; i < 3; i++)
-                {
-                    sendString += Network.this.values[i] + ":";
-                }
-                writer.println(sendString);
+                networkTable.putNumber("x", Network.this.values[0]);
+                networkTable.putNumber("y", Network.this.values[1]);
+                networkTable.putNumber("z", Network.this.values[2]);
             }
         }).start();
     }
